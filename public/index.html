@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.js"></script></head>
+
+<input id="sloganText">
+<button id="submitSlogan">Submit</button>
+    
+<div id="slogansLastUpdatedTime">
+    
+</div>
+<div id="slogansArea">
+    
+</div>
+    
+<script>
+ 
+ var lastServerTime;
+ $(document).ready(function(){
+     
+     getSlogans();
+     
+     
+     $("#submitSlogan").click(function(){
+         
+         console.log("you click!"); 
+         
+         if($("#sloganText").val()){
+         
+         sendSlogan($("#sloganText").val())
+         }else{
+            console.log("input slogan for voting!");
+         }
+     }
+                             
+     );
+
+     
+     
+ }); 
+    
+function sendSlogan(sloganText){
+           $.ajax({
+              method: "PUT",
+              url: "http://localhost:8000/slogans/" +sloganText
+            })
+          .done(function( msg ) {
+            alert( "Data Saved: " + msg );
+          });
+}
+    
+function getSlogans(){
+    
+          $.ajax({
+              method: "GET",
+              url: "http://localhost:8000/slogans/" 
+            })
+          .done(function( msg ) {
+            
+              $('#slogansLastUpdatedTime').html(msg.serverTime);
+              lastServerTime = msg.serverTime;
+              
+              for (var i = 0; i < msg.slogans.length ; i++){
+                $('#slogansArea').append(msg.slogans[i]);
+              }
+              
+              waitForChanges();
+                    
+          });   
+    
+    
+    
+}
+    
+ function waitForChanges() {
+     
+           $.ajax({
+              method: "GET",
+              url: "http://localhost:8000/slogans/",
+              data:{ lastReceivedTime: lastServerTime}
+            })
+          .done(function( msg ) {
+            
+              $('#slogansLastUpdatedTime').html(msg.serverTime);
+              lastServerTime = msg.serverTime;
+               
+              for (var i = 0; i < msg.slogans.length ; i++){
+                $('#slogansArea').append(msg.slogans[i]);
+              }
+              waitForChanges();
+                    
+          });      
+}   
+</script>
+</html>
