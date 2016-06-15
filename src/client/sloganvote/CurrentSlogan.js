@@ -9,16 +9,24 @@ import {
   ListView
 } from 'react-native';
 import Button from 'react-native-button';
-import Meteor from 'react-native-meteor';
+import Meteor,{ connectMeteor, MeteorComplexListView } from 'react-native-meteor';
 
-
+@connectMeteor
 export default class CurrentSlogan extends Component {
  
 
+
+  getMeteorData() {
+    const slogansHandle = Meteor.subscribe('slogans.public');
+    return {
+      slogansReady: slogansHandle.ready()
+    };
+  }
+    
   constructor(props) {
     super(props);
     
-      var slogans = Meteor.collection('Slogans').find();
+      /*var slogans = Meteor.collection('Slogans').find();
       console.log(slogans);
       var slogansStringArray = [];
       slogans.map(function(eachSlogan){
@@ -28,7 +36,7 @@ export default class CurrentSlogan extends Component {
            
     this.state = {
       dataSource: ds.cloneWithRows(slogansStringArray),
-    };
+    };*/
 
   }
    
@@ -43,7 +51,17 @@ export default class CurrentSlogan extends Component {
     );
   }
     
-  render() {  
+  render() { 
+    const { slogansReady } = this.data;
+    
+    if (!slogansReady) {
+        return (
+            <View>
+                <Text>Loading...</Text>
+            </View>
+        )
+    }     
+    
     return (
       <View style={styles.container}>
          <Button
@@ -53,10 +71,11 @@ export default class CurrentSlogan extends Component {
             Back
         </Button>     
         
-        <ListView
-        dataSource={this.state.dataSource}
-        renderRow={(rowData) => <Text>{rowData}</Text>}
-        />       
+        <MeteorComplexListView
+          style={styles.container}
+          elements={()=>{return Meteor.collection('Slogans').find()}}
+          renderRow={this.renderRow}
+        />  
         
            
       </View>
@@ -67,8 +86,6 @@ export default class CurrentSlogan extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
   welcome: {
