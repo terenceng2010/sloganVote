@@ -49,14 +49,16 @@ export default class CurrentSlogan extends Component {
   }
   
   renderRow(slogan) {
+    
+    //https://facebook.github.io/react/tips/if-else-in-JSX.html 
     return (
         <View style={styles.renderRow}>
-            <Text style={{flex:0.8}}>{slogan.slogan} </Text>
+            <Text style={{flex:0.7}}>{slogan.slogan} </Text>
             <Button
-                containerStyle={{flex:0.2}}
+                containerStyle={{flex:0.3}}
                 style={{fontSize: 20, color: 'black' }}
                 onPress={() => this._handleUpVote(slogan._id) }>
-                👍 ({slogan.vote})
+                👍 ({slogan.vote ? slogan.vote : 0})
             </Button>
         </View>
     );

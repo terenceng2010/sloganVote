@@ -33,6 +33,14 @@ export default class NewSlogan extends Component {
             this.state.text,
         );
     Meteor.call('addSlogan',this.state.text);
+    
+    //set text to '' so that no text is displayed on the sign post
+    //http://stackoverflow.com/questions/30852251/react-native-this-setstate-not-working
+    this.setState({text:''});
+    
+    //setNativeProps to clear TextInput value
+    //https://facebook.github.io/react-native/docs/direct-manipulation.html
+    this._textInput.setNativeProps({text: ''});
   }
   
   render() {
@@ -62,6 +70,7 @@ export default class NewSlogan extends Component {
                   
         </View>
             <TextInput
+                ref={component => this._textInput = component}
                 style={styles.textEdit}
                 onChangeText={(text) => this.setState({text})}
                 placeholder="What you gotta say?"
