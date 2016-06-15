@@ -65,3 +65,4 @@ const styles = StyleSheet.create({
 });
 
 AppRegistry.registerComponent('sloganvote', () => sloganvote);
+

@@ -5,17 +5,45 @@ import {
   AppRegistry,
   StyleSheet,
   Text,
-  View
+  View,
+  ListView
 } from 'react-native';
 import Button from 'react-native-button';
+import Meteor from 'react-native-meteor';
+
 
 export default class CurrentSlogan extends Component {
+ 
+
+  constructor(props) {
+    super(props);
     
+      var slogans = Meteor.collection('Slogans').find();
+      console.log(slogans);
+      var slogansStringArray = [];
+      slogans.map(function(eachSlogan){
+          slogansStringArray.push(eachSlogan.slogan);
+      })     
+      var ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
+           
+    this.state = {
+      dataSource: ds.cloneWithRows(slogansStringArray),
+    };
+
+  }
+   
+     
   _handlePress() {
     this.props.navigator.push({id: 1,});
   }
-  
-  render() {
+
+  renderRow(slogan) {
+    return (
+      <Text>{slogan.slogan}</Text>
+    );
+  }
+    
+  render() {  
     return (
       <View style={styles.container}>
          <Button
@@ -24,9 +52,13 @@ export default class CurrentSlogan extends Component {
             onPress={() => this._handlePress()}>
             Back
         </Button>     
-        <Text style={styles.welcome}>
-          Current Slogan
-        </Text>
+        
+        <ListView
+        dataSource={this.state.dataSource}
+        renderRow={(rowData) => <Text>{rowData}</Text>}
+        />       
+        
+           
       </View>
     );
   }

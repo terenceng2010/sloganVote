@@ -13,3 +13,8 @@ Meteor.methods({
    }
     
 });
+
+Meteor.publish('slogans.public', function() {
+  console.log('publish slogans.public');
+  return Slogans.find({});
+});
