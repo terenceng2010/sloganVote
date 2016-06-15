@@ -1,4 +1,4 @@
-# sloganVote
+# Slogan Vote
 Realtime Slogan Voting for assembly (i.e public protest, gathering or public promotion of an association)
 
 ## Why
