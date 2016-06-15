@@ -6,7 +6,8 @@ import {
   StyleSheet,
   Text,
   View,
-  ListView
+  ListView,
+  Alert
 } from 'react-native';
 import Button from 'react-native-button';
 import Meteor,{ connectMeteor, MeteorComplexListView } from 'react-native-meteor';
@@ -25,18 +26,12 @@ export default class CurrentSlogan extends Component {
     
   constructor(props) {
     super(props);
-    
-      /*var slogans = Meteor.collection('Slogans').find();
-      console.log(slogans);
-      var slogansStringArray = [];
-      slogans.map(function(eachSlogan){
-          slogansStringArray.push(eachSlogan.slogan);
-      })     
-      var ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
-           
-    this.state = {
-      dataSource: ds.cloneWithRows(slogansStringArray),
-    };*/
+
+    //http://stackoverflow.com/questions/29532926/this-value-is-null-in-function-react-native
+    //binding function
+    this.renderRow = this.renderRow.bind(this);
+    this._handleUpVote = this._handleUpVote.bind(this);
+        
 
   }
    
@@ -45,9 +40,25 @@ export default class CurrentSlogan extends Component {
     this.props.navigator.push({id: 1,});
   }
 
+  _handleUpVote(sloganId) {
+    /*Alert.alert(
+            'The slogan is upvoted!',
+            sloganId,
+        );*/
+    Meteor.call('upVote',sloganId);
+  }
+  
   renderRow(slogan) {
     return (
-      <Text>{slogan.slogan}</Text>
+        <View style={styles.renderRow}>
+            <Text style={{flex:0.8}}>{slogan.slogan} </Text>
+            <Button
+                containerStyle={{flex:0.2}}
+                style={{fontSize: 20, color: 'black' }}
+                onPress={() => this._handleUpVote(slogan._id) }>
+                👍 ({slogan.vote})
+            </Button>
+        </View>
     );
   }
     
@@ -73,7 +84,7 @@ export default class CurrentSlogan extends Component {
         
         <MeteorComplexListView
           style={styles.container}
-          elements={()=>{return Meteor.collection('Slogans').find()}}
+          elements={()=>{return Meteor.collection('Slogans').find({}, {sort: {vote: -1}})}}
           renderRow={this.renderRow}
         />  
         
@@ -84,6 +95,13 @@ export default class CurrentSlogan extends Component {
 }
 
 const styles = StyleSheet.create({
+  renderRow: {
+    paddingTop:10,
+    paddingBottom:10,
+    justifyContent: 'space-between',
+    alignItems: 'center',    
+    flexDirection:'row'  
+  },    
   container: {
     flex: 1,
     backgroundColor: '#F5FCFF',

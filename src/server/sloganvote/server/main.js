@@ -10,6 +10,12 @@ Meteor.methods({
    
    addSlogan:function(sloganString){
        Slogans.insert({slogan:sloganString});
+   },
+   upVote:function(sloganId){
+       Slogans.update(
+          {_id: sloganId},
+          { $inc : {vote:1} } 
+       )
    }
     
 });
