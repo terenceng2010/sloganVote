@@ -10,7 +10,7 @@ Inspired from Team Fortress 2 voting feature. https://wiki.teamfortress.com/wiki
 to have more variety in an assembly.
 
 ## How to Use
-extract and run node server.js
+TBD
 
 ## What it uses
 * React Native (client)
