@@ -13,11 +13,9 @@ to have more variety in an assembly.
 extract and run node server.js
 
 ## What it uses
-* Node js
-* it now uses long-polling. New messages would be pushed to existing users, while new users would have all messages retrieved. (Usage of timestamp)
+* React Native (client)
+* Meteor (server)
 
 ## Limitation
 * actual voting function is not added.
 * user record is not yet added.
-* no permenant storage nor in-memory db like redis.
-* a proper UI
