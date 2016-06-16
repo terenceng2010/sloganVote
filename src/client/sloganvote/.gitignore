@@ -30,11 +30,19 @@ local.properties
 
 # node.js
 #
-node_modules/
+node_modules/*
 npm-debug.log
+
+#customized ddp.js in react-native-meteor
+!node_modules/react-native-meteor/
+node_modules/react-native-meteor/*
+!node_modules/react-native-meteor/lib/
+node_modules/react-native-meteor/lib/*
+!node_modules/react-native-meteor/lib/ddp.js
 
 # BUCK
 buck-out/
 \.buckd/
 android/app/libs
 android/keystores/debug.keystore
+

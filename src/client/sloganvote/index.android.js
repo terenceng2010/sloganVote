@@ -10,7 +10,8 @@ import {
   StyleSheet,
   Text,
   View,
-  Navigator
+  Navigator,
+  Alert
 } from 'react-native';
 
 import Meteor, { createContainer } from 'react-native-meteor';
@@ -20,7 +21,15 @@ import CurrentSlogan from './CurrentSlogan';
 import NewSlogan from './NewSlogan';
 
 Meteor.connect('ws://192.168.1.82:3000/websocket');//do this only once
-
+Meteor.ddp.on("streamy", message => {
+    //console.log('a streamy msg', message.data);
+    if(message.data === 'callForVote'){
+        Alert.alert(
+                'Call for Vote!',
+                'Call for Vote!',
+            );        
+    }
+});
 class sloganvote extends Component {
 
   _renderScene(route, navigator) {
