@@ -16,6 +16,9 @@ Meteor.methods({
           {_id: sloganId},
           { $inc : {vote:1} } 
        )
+   },
+   callForVote:function(){
+       Streamy.broadcast('callForVote', { data: 'callForVote' });
    }
     
 });

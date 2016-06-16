@@ -26,7 +26,7 @@ Meteor.ddp.on("streamy", message => {
     if(message.data === 'callForVote'){
         Alert.alert(
                 'Call for Vote!',
-                'Call for Vote!',
+                '要求表決!',
             );        
     }
 });

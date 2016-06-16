@@ -48,6 +48,14 @@ export default class CurrentSlogan extends Component {
     Meteor.call('upVote',sloganId);
   }
   
+  _handleCallForVote() {
+    /*Alert.alert(
+            'The slogan is upvoted!',
+            sloganId,
+        );*/
+    Meteor.call('callForVote');
+  }
+    
   renderRow(slogan) {
     
     //https://facebook.github.io/react/tips/if-else-in-JSX.html 
@@ -89,7 +97,12 @@ export default class CurrentSlogan extends Component {
           elements={()=>{return Meteor.collection('Slogans').find({}, {sort: {vote: -1}})}}
           renderRow={this.renderRow}
         />  
-        
+         <Button
+            containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: 'royalblue'}}
+            style={{fontSize: 20, color: 'white'}}
+            onPress={() => this._handleCallForVote()}>
+            Call For Vote!
+        </Button>        
            
       </View>
     );
