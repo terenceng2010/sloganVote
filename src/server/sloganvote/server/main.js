@@ -73,10 +73,7 @@ Meteor.methods({
                console.log('voteResult',voteResult);
                
                Slogans.update({_id: voteResult[0]._id},{$set: { elected:true}});
-               if(voteResult[1] && voteResult[1]._id)
-               Slogans.update({_id: voteResult[1]._id},{$set: { elected:true}});
-               if(voteResult[2] && voteResult[2]._id)               
-               Slogans.update({_id: voteResult[2]._id},{$set: { elected:true}});             
+          
            }),
            start: false,
            timeZone: 'Asia/Hong_Kong'
