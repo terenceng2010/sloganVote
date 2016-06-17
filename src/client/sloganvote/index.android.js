@@ -43,6 +43,13 @@ Meteor.ddp.on("streamy", message => {
         }
     });            
    }
+   
+   if(message.data === 'voteEnd'){
+        Alert.alert(
+                'Vote ends',
+                'Vote ends',
+            ); 
+   }
 });
 class sloganvote extends Component {
 
