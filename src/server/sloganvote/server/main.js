@@ -25,12 +25,13 @@ Meteor.methods({
 
        if(Elections.find({incomplete:true}).count() > 0 ){
            console.log('There is a election right now');
-           return;
+            return {line1:'There is a election right now',line2:''};
        }
        var previousValidElection = Elections.findOne( { validUntil:{ $gte: new Date() } } )
        if(previousValidElection){
            console.log('The previous election is still valid until: ', previousValidElection.validUntil);
-           return;
+        
+         return {line1:'The previous election is still valid until:',line2: new Date(previousValidElection.validUntil).toTimeString() };
        }
        
        var electId = Elections.insert({incomplete:true,createdAt:new Date()});

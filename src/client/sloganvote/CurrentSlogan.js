@@ -66,7 +66,11 @@ export default class CurrentSlogan extends Component {
             'The slogan is upvoted!',
             sloganId,
         );*/
-    Meteor.call('callForVote');
+    Meteor.call('callForVote',function(err,result){
+        if(result){
+            Alert.alert(result.line1,result.line2);
+        }
+    });
   }
     
   renderRow(slogan) {
