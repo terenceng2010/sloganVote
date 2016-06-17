@@ -16,6 +16,14 @@ Meteor.methods({
        Slogans.insert({slogan:sloganString});
    },
    upVote:function(sloganId){
+       
+       var previousValidElection = Elections.findOne( { validUntil:{ $gte: new Date() } } )
+       if(previousValidElection){
+           console.log('The previous election is still valid until: ', previousValidElection.validUntil);
+        
+         return {line1:'The previous election is still valid until:',line2: new Date(previousValidElection.validUntil).toTimeString() };
+       }
+              
        Slogans.update(
           {_id: sloganId},
           { $inc : {vote:1} } 
@@ -39,7 +47,7 @@ Meteor.methods({
        Streamy.broadcast('callForVote', { data: 'callForVote' });
        
        //reset vote count
-       Slogans.update({}, {$set: {vote:0}}, { multi: true })
+       Slogans.update({}, {$set: {vote:0, elected: false}}, { multi: true })
        
        //http://stackoverflow.com/questions/7687884/add-10-seconds-to-a-javascript-date-object-timeobject?lq=1
        //vote finish time = now + 30 seconds
@@ -60,7 +68,15 @@ Meteor.methods({
                //https://forums.meteor.com/t/how-do-fibers-and-meteor-asyncwrap-work/6087/24
                //Meteor.bindEnvironment is required because of below line         
                Elections.update({_id: electId},{$set:{ incomplete:false, validUntil: validUntil } } );
-             
+               
+               var voteResult = Slogans.find({}, {sort: {vote: -1}}).fetch();
+               console.log('voteResult',voteResult);
+               
+               Slogans.update({_id: voteResult[0]._id},{$set: { elected:true}});
+               if(voteResult[1] && voteResult[1]._id)
+               Slogans.update({_id: voteResult[1]._id},{$set: { elected:true}});
+               if(voteResult[2] && voteResult[2]._id)               
+               Slogans.update({_id: voteResult[2]._id},{$set: { elected:true}});             
            }),
            start: false,
            timeZone: 'Asia/Hong_Kong'

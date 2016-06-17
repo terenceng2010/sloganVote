@@ -75,10 +75,17 @@ export default class CurrentSlogan extends Component {
     
   renderRow(slogan) {
     
+    var sloganText;
+    if( slogan.elected){
+        sloganText =  <Text style={{flex:0.7, backgroundColor:'#8AE234'}}>{slogan.slogan} </Text>;
+    }else{
+        sloganText =  <Text style={{flex:0.7}}>{slogan.slogan} </Text>;
+    }
+    
     //https://facebook.github.io/react/tips/if-else-in-JSX.html 
     return (
         <View style={styles.renderRow}>
-            <Text style={{flex:0.7}}>{slogan.slogan} </Text>
+            {sloganText}
             <Button
                 containerStyle={{flex:0.3}}
                 style={{fontSize: 20, color: 'black' }}
