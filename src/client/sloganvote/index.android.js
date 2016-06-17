@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 
 import Meteor, { createContainer } from 'react-native-meteor';
+import Sound from 'react-native-sound';
 
 import SplashScreen from './SplashScreen';
 import CurrentSlogan from './CurrentSlogan';
@@ -27,8 +28,21 @@ Meteor.ddp.on("streamy", message => {
         Alert.alert(
                 'Call for Vote!',
                 '要求表決!',
-            );        
-    }
+            );  
+            
+    var initialDrum = new Sound('initialdrum.wav', Sound.MAIN_BUNDLE, (error) => {
+        if (error) {
+            console.log('failed to load the sound', error);
+        } else { // loaded successfully
+            //console.log('duration in seconds: ' + initialDrum.getDuration() + 'number of channels: ' + initialDrum.getNumberOfChannels());
+            initialDrum.play(function(){
+                
+                //Release the audio player resource
+                initialDrum.release();
+            });
+        }
+    });            
+   }
 });
 class sloganvote extends Component {
 

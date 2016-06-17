@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import Button from 'react-native-button';
 import Meteor,{ connectMeteor, MeteorComplexListView } from 'react-native-meteor';
+import Sound from 'react-native-sound';
 
 @connectMeteor
 export default class CurrentSlogan extends Component {
@@ -46,6 +47,18 @@ export default class CurrentSlogan extends Component {
             sloganId,
         );*/
     Meteor.call('upVote',sloganId);
+    var drum = new Sound('drum.mp3', Sound.MAIN_BUNDLE, (error) => {
+        if (error) {
+            console.log('failed to load the sound', error);
+        } else { // loaded successfully
+            //console.log('duration in seconds: ' + initialDrum.getDuration() + 'number of channels: ' + initialDrum.getNumberOfChannels());
+            drum.play(function(){
+                // Release the audio player resource
+                drum.release();
+            });
+        }
+    }); 
+        
   }
   
   _handleCallForVote() {

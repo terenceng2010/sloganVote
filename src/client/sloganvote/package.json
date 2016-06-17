@@ -9,7 +9,8 @@
     "react": "^15.1.0",
     "react-native": "0.27.2",
     "react-native-button": "^1.6.0",
-    "react-native-meteor": "^1.0.0-rc8"
+    "react-native-meteor": "^1.0.0-rc8",
+    "react-native-sound": "^0.8.3"
   },
   "devDependencies": {
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
