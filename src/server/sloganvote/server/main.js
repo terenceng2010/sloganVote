@@ -23,6 +23,11 @@ Meteor.methods({
         
          return {line1:'The previous election is still valid until:',line2: new Date(previousValidElection.validUntil).toTimeString() };
        }
+ 
+       var noElectionYet = Elections.find().count();
+       if(noElectionYet == 0){
+           return {line1:'No election yet',line2:''};
+       }
               
        Slogans.update(
           {_id: sloganId},
@@ -58,22 +63,30 @@ Meteor.methods({
            cronTime: voteFinishTime,
            onTick: Meteor.bindEnvironment(function() {
                
-               //the elect result is valid for 5 minutes
-               var validUntil = new Date();
-               validUntil.setMinutes(validUntil.getMinutes() + 5);
+
                
                console.log('time is up!');
                Streamy.broadcast('callForVote', { data: 'voteEnd' });
 
                //https://forums.meteor.com/t/how-do-fibers-and-meteor-asyncwrap-work/6087/24
                //Meteor.bindEnvironment is required because of below line         
-               Elections.update({_id: electId},{$set:{ incomplete:false, validUntil: validUntil } } );
+
+               //the elect result is valid for 5 minutes
+               var validUntil = new Date();
+               validUntil.setMinutes(validUntil.getMinutes() + 5);               
                
                var voteResult = Slogans.find({}, {sort: {vote: -1}}).fetch();
                console.log('voteResult',voteResult);
-               
                Slogans.update({_id: voteResult[0]._id},{$set: { elected:true}});
-          
+               
+               //copy the election's slogans to election obj.
+               var allSlogansResult = Slogans.find({}, {sort: {vote: -1}}).fetch();
+               Elections.update({_id: electId},{$set:{ incomplete:false, validUntil: validUntil, allSlogans: allSlogansResult} } );
+               
+               //remove all slogans from slogans collection
+               Slogans.remove({});
+               
+               
            }),
            start: false,
            timeZone: 'Asia/Hong_Kong'
@@ -86,4 +99,9 @@ Meteor.methods({
 Meteor.publish('slogans.public', function() {
   console.log('publish slogans.public');
   return Slogans.find({});
+});
+
+Meteor.publish('elections.public', function() {
+  console.log('publish elections.public');
+  return Elections.find({});
 });

@@ -20,8 +20,10 @@ export default class CurrentSlogan extends Component {
 
   getMeteorData() {
     const slogansHandle = Meteor.subscribe('slogans.public');
+    const electionsHandle = Meteor.subscribe('elections.public');
     return {
-      slogansReady: slogansHandle.ready()
+      slogansReady: slogansHandle.ready(),
+      electionsReady: electionsHandle.ready()
     };
   }
     
@@ -77,7 +79,7 @@ export default class CurrentSlogan extends Component {
     
     var sloganText;
     if( slogan.elected){
-        sloganText =  <Text style={{flex:0.7, backgroundColor:'#8AE234'}}>{slogan.slogan} </Text>;
+        sloganText =  <Text style={{flex:0.7, backgroundColor:'#EA526F'}}>{slogan.slogan} </Text>;
     }else{
         sloganText =  <Text style={{flex:0.7}}>{slogan.slogan} </Text>;
     }
@@ -97,7 +99,7 @@ export default class CurrentSlogan extends Component {
   }
     
   render() { 
-    const { slogansReady } = this.data;
+    const { slogansReady,electionsReady } = this.data;
     
     if (!slogansReady) {
         return (
@@ -107,29 +109,73 @@ export default class CurrentSlogan extends Component {
         )
     }     
     
-    return (
-      <View style={styles.container}>
-         <Button
-            containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: 'royalblue'}}
-            style={{fontSize: 20, color: 'white'}}
-            onPress={() => this._handlePress()}>
-            Back
-        </Button>     
+    
+    if(Meteor.collection('Elections').findOne({incomplete:true})){
+    //if there is an on-going 
+        return (
+            <View style={styles.container}>
+                <Button
+                    containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: '#EA526F'}}
+                    style={{fontSize: 20, color: 'white'}}
+                    onPress={() => this._handlePress()}>
+                    Back
+                </Button>     
+                
+                <MeteorComplexListView
+                style={styles.container}
+                elements={()=>{return Meteor.collection('Slogans').find({}, {sort: {vote: -1}})}}
+                renderRow={this.renderRow}
+                />                  
+            </View>
+        );
+    }else{
         
-        <MeteorComplexListView
-          style={styles.container}
-          elements={()=>{return Meteor.collection('Slogans').find({}, {sort: {vote: -1}})}}
-          renderRow={this.renderRow}
-        />  
-         <Button
-            containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: 'royalblue'}}
-            style={{fontSize: 20, color: 'white'}}
-            onPress={() => this._handleCallForVote()}>
-            Call For Vote!
-        </Button>        
-           
-      </View>
-    );
+        var allSlogans;
+        if(Meteor.collection('Elections').findOne() ){
+            allSlogans =
+                <MeteorComplexListView
+                    style={styles.container}
+                    elements={ ()=>{ return Meteor.collection('Elections').find({}, {sort: {createdAt: -1}})[0].allSlogans} }
+                    renderRow={this.renderRow}
+                />  ;
+        }else{
+            allSlogans = 
+                <MeteorComplexListView
+                    style={styles.container}
+                    elements={()=>{return Meteor.collection('Slogans').find({}, {sort: {vote: -1}})}}
+                    renderRow={this.renderRow}
+                />  ;
+        }
+        
+        
+        return (
+            <View style={styles.container}>
+                <Button
+                    containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: '#EA526F'}}
+                    style={{fontSize: 20, color: 'white'}}
+                    onPress={() => this._handlePress()}>
+                    Back
+                </Button>     
+                <Text>Current Vote Result</Text>
+                {allSlogans}
+                <Text>Next Vote Candidate</Text>
+                <MeteorComplexListView
+                    style={styles.container}
+                    elements={()=>{return Meteor.collection('Slogans').find({}, {sort: {vote: -1}})}}
+                    renderRow={this.renderRow}
+                />             
+                <Button
+                    containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: '#EA526F'}}
+                    style={{fontSize: 20, color: 'white'}}
+                    onPress={() => this._handleCallForVote()}>
+                    Call For Vote!
+                </Button>        
+                
+            </View>
+        );    
+            
+        
+    }
   }
 }
 

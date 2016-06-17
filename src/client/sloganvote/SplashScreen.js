@@ -22,14 +22,14 @@ export default class SplashScreen extends Component {
           Welcome to Slogan Vote!
         </Text>
         <Button
-            containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: 'royalblue'}}
+            containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: '#EA526F'}}
             style={{fontSize: 20, color: 'white'}}
             onPress={() => this._handlePress(2)}>
             What is the next slogan?
         </Button>
                 
         <Button
-            containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: 'royalblue'}}
+            containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: '#EA526F'}}
             style={{fontSize: 20, color: 'white'}}
             onPress={() => this._handlePress(3)}>
             View current slogan
@@ -44,12 +44,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#FCEADE',
   },
   welcome: {
     fontSize: 20,
     textAlign: 'center',
     margin: 10,
+    color:'#25CED1'
   },
   instructions: {
     textAlign: 'center',

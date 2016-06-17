@@ -48,7 +48,7 @@ export default class NewSlogan extends Component {
       <View  style={styles.mainContainer}>
         <View style={styles.toolbar}>
             <Button
-                containerStyle={{margin: 0,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: 'royalblue'}}
+                containerStyle={{margin: 0,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: '#EA526F'}}
                 style={{fontSize: 20, color: 'white'}}
                 onPress={() => this._handlePress()}>
                 Back
@@ -57,7 +57,7 @@ export default class NewSlogan extends Component {
             New Slogan
             </Text>        
             <Button
-                containerStyle={{margin: 0,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: 'royalblue'}}
+                containerStyle={{margin: 0,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: '#EA526F'}}
                 style={{fontSize: 20, color: 'white'}}
                 onPress={() => this.submitText()}>
                 Submit
@@ -89,6 +89,7 @@ NewSlogan.defaultProps = { initialText: '' };
 const styles = StyleSheet.create({
     mainContainer:{
         flex: 1,
+        backgroundColor:'#FCEADE'
     },
     content:{
         flex:1,
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
       fontSize:20  
     },
   toolbar: {
-    backgroundColor:'#81c04d',
+    backgroundColor:'#25CED1',
     paddingTop:10,
     paddingBottom:10,
     justifyContent: 'space-between',
@@ -118,6 +119,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
     margin: 10,
+    color:'white'
   },
   instructions: {
     textAlign: 'center',
