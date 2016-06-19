@@ -123,7 +123,7 @@ export default class CurrentSlogan extends Component {
                 
                 <MeteorComplexListView
                 style={styles.container}
-                elements={()=>{return Meteor.collection('Slogans').find({}, {sort: {vote: -1}})}}
+                elements={()=>{return Meteor.collection('Slogans').find({}, {sort: {slogan: -1}})}}
                 renderRow={this.renderRow}
                 />                  
             </View>
