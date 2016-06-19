@@ -97,7 +97,47 @@ export default class CurrentSlogan extends Component {
         </View>
     );
   }
+
+  renderLastElectionRow(slogan) {
     
+    var sloganText;
+    if( slogan.elected){
+        sloganText =  <Text style={{flex:0.7, backgroundColor:'#EA526F'}}>{slogan.slogan} </Text>;
+    }else{
+        sloganText =  <Text style={{flex:0.7}}>{slogan.slogan} </Text>;
+    }
+    
+    //https://facebook.github.io/react/tips/if-else-in-JSX.html 
+    return (
+        <View style={styles.renderRow}>
+            {sloganText}
+            <Button
+                containerStyle={{flex:0.3}}
+                style={{fontSize: 20, color: 'black' }}
+                >
+                👍 ({slogan.vote ? slogan.vote : 0})
+            </Button>
+        </View>
+    );
+  }
+  
+  renderCandidateRow(slogan) {
+    
+    var sloganText;
+    if( slogan.elected){
+        sloganText =  <Text style={{flex:0.7, backgroundColor:'#EA526F'}}>{slogan.slogan} </Text>;
+    }else{
+        sloganText =  <Text style={{flex:0.7}}>{slogan.slogan} </Text>;
+    }
+    
+    //https://facebook.github.io/react/tips/if-else-in-JSX.html 
+    return (
+        <View style={styles.renderRow}>
+            {sloganText}
+        </View>
+    );
+  }
+      
   render() { 
     const { slogansReady,electionsReady } = this.data;
     
@@ -111,7 +151,8 @@ export default class CurrentSlogan extends Component {
     
     
     if(Meteor.collection('Elections').findOne({incomplete:true})){
-    //if there is an on-going 
+    //if there is an on-going
+        
         return (
             <View style={styles.container}>
                 <Button
@@ -132,21 +173,28 @@ export default class CurrentSlogan extends Component {
         
         var allSlogans;
         if(Meteor.collection('Elections').findOne() ){
+            
+            //an incomplete elections does not have allslogans. So we need to find with incomplete equals false
             allSlogans =
                 <MeteorComplexListView
                     style={styles.container}
-                    elements={ ()=>{ return Meteor.collection('Elections').find({}, {sort: {createdAt: -1}})[0].allSlogans} }
-                    renderRow={this.renderRow}
+                    elements={ ()=>{ return Meteor.collection('Elections').find({incomplete:false}, {sort: {createdAt: -1}})[0].allSlogans} }
+                    renderRow={this.renderLastElectionRow}
                 />  ;
         }else{
-            allSlogans = 
-                <MeteorComplexListView
-                    style={styles.container}
-                    elements={()=>{return Meteor.collection('Slogans').find({}, {sort: {vote: -1}})}}
-                    renderRow={this.renderRow}
-                />  ;
+            allSlogans = <Text>No Previous Election.</Text>
         }
         
+        var nextVoteCandidates;
+        if( Meteor.collection('Slogans').find({}).length >0 ){
+            nextVoteCandidates =  <MeteorComplexListView
+                    style={styles.container}
+                    elements={()=>{return Meteor.collection('Slogans').find({}, {sort: {vote: -1}})}}
+                    renderRow={this.renderCandidateRow}
+                />  
+        }else{
+            nextVoteCandidates = <Text>No next vote candidate yet.</Text>
+        }
         
         return (
             <View style={styles.container}>
@@ -159,11 +207,7 @@ export default class CurrentSlogan extends Component {
                 <Text>Current Vote Result</Text>
                 {allSlogans}
                 <Text>Next Vote Candidate</Text>
-                <MeteorComplexListView
-                    style={styles.container}
-                    elements={()=>{return Meteor.collection('Slogans').find({}, {sort: {vote: -1}})}}
-                    renderRow={this.renderRow}
-                />             
+                {nextVoteCandidates}
                 <Button
                     containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: '#EA526F'}}
                     style={{fontSize: 20, color: 'white'}}
