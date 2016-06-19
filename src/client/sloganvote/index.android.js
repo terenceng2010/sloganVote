@@ -10,17 +10,47 @@ import {
   StyleSheet,
   Text,
   View,
-  Navigator
+  Navigator,
+  Alert
 } from 'react-native';
 
 import Meteor, { createContainer } from 'react-native-meteor';
+import Sound from 'react-native-sound';
 
 import SplashScreen from './SplashScreen';
 import CurrentSlogan from './CurrentSlogan';
 import NewSlogan from './NewSlogan';
 
 Meteor.connect('ws://192.168.1.82:3000/websocket');//do this only once
-
+Meteor.ddp.on("streamy", message => {
+    //console.log('a streamy msg', message.data);
+    if(message.data === 'callForVote'){
+        Alert.alert(
+                'Call for Vote!',
+                '要求表決!',
+            );  
+            
+    var initialDrum = new Sound('initialdrum.wav', Sound.MAIN_BUNDLE, (error) => {
+        if (error) {
+            console.log('failed to load the sound', error);
+        } else { // loaded successfully
+            //console.log('duration in seconds: ' + initialDrum.getDuration() + 'number of channels: ' + initialDrum.getNumberOfChannels());
+            initialDrum.play(function(){
+                
+                //Release the audio player resource
+                initialDrum.release();
+            });
+        }
+    });            
+   }
+   
+   if(message.data === 'voteEnd'){
+        Alert.alert(
+                'Vote ends',
+                'Vote ends',
+            ); 
+   }
+});
 class sloganvote extends Component {
 
   _renderScene(route, navigator) {

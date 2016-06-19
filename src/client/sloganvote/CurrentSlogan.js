@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import Button from 'react-native-button';
 import Meteor,{ connectMeteor, MeteorComplexListView } from 'react-native-meteor';
+import Sound from 'react-native-sound';
 
 @connectMeteor
 export default class CurrentSlogan extends Component {
@@ -19,8 +20,10 @@ export default class CurrentSlogan extends Component {
 
   getMeteorData() {
     const slogansHandle = Meteor.subscribe('slogans.public');
+    const electionsHandle = Meteor.subscribe('elections.public');
     return {
-      slogansReady: slogansHandle.ready()
+      slogansReady: slogansHandle.ready(),
+      electionsReady: electionsHandle.ready()
     };
   }
     
@@ -46,14 +49,45 @@ export default class CurrentSlogan extends Component {
             sloganId,
         );*/
     Meteor.call('upVote',sloganId);
+    var drum = new Sound('drum.mp3', Sound.MAIN_BUNDLE, (error) => {
+        if (error) {
+            console.log('failed to load the sound', error);
+        } else { // loaded successfully
+            //console.log('duration in seconds: ' + initialDrum.getDuration() + 'number of channels: ' + initialDrum.getNumberOfChannels());
+            drum.play(function(){
+                // Release the audio player resource
+                drum.release();
+            });
+        }
+    }); 
+        
   }
   
+  _handleCallForVote() {
+    /*Alert.alert(
+            'The slogan is upvoted!',
+            sloganId,
+        );*/
+    Meteor.call('callForVote',function(err,result){
+        if(result){
+            Alert.alert(result.line1,result.line2);
+        }
+    });
+  }
+    
   renderRow(slogan) {
+    
+    var sloganText;
+    if( slogan.elected){
+        sloganText =  <Text style={{flex:0.7, backgroundColor:'#EA526F'}}>{slogan.slogan} </Text>;
+    }else{
+        sloganText =  <Text style={{flex:0.7}}>{slogan.slogan} </Text>;
+    }
     
     //https://facebook.github.io/react/tips/if-else-in-JSX.html 
     return (
         <View style={styles.renderRow}>
-            <Text style={{flex:0.7}}>{slogan.slogan} </Text>
+            {sloganText}
             <Button
                 containerStyle={{flex:0.3}}
                 style={{fontSize: 20, color: 'black' }}
@@ -63,9 +97,49 @@ export default class CurrentSlogan extends Component {
         </View>
     );
   }
+
+  renderLastElectionRow(slogan) {
     
+    var sloganText;
+    if( slogan.elected){
+        sloganText =  <Text style={{flex:0.7, backgroundColor:'#EA526F'}}>{slogan.slogan} </Text>;
+    }else{
+        sloganText =  <Text style={{flex:0.7}}>{slogan.slogan} </Text>;
+    }
+    
+    //https://facebook.github.io/react/tips/if-else-in-JSX.html 
+    return (
+        <View style={styles.renderRow}>
+            {sloganText}
+            <Button
+                containerStyle={{flex:0.3}}
+                style={{fontSize: 20, color: 'black' }}
+                >
+                👍 ({slogan.vote ? slogan.vote : 0})
+            </Button>
+        </View>
+    );
+  }
+  
+  renderCandidateRow(slogan) {
+    
+    var sloganText;
+    if( slogan.elected){
+        sloganText =  <Text style={{flex:0.7, backgroundColor:'#EA526F'}}>{slogan.slogan} </Text>;
+    }else{
+        sloganText =  <Text style={{flex:0.7}}>{slogan.slogan} </Text>;
+    }
+    
+    //https://facebook.github.io/react/tips/if-else-in-JSX.html 
+    return (
+        <View style={styles.renderRow}>
+            {sloganText}
+        </View>
+    );
+  }
+      
   render() { 
-    const { slogansReady } = this.data;
+    const { slogansReady,electionsReady } = this.data;
     
     if (!slogansReady) {
         return (
@@ -75,24 +149,77 @@ export default class CurrentSlogan extends Component {
         )
     }     
     
-    return (
-      <View style={styles.container}>
-         <Button
-            containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: 'royalblue'}}
-            style={{fontSize: 20, color: 'white'}}
-            onPress={() => this._handlePress()}>
-            Back
-        </Button>     
+    
+    if(Meteor.collection('Elections').findOne({incomplete:true})){
+    //if there is an on-going
         
-        <MeteorComplexListView
-          style={styles.container}
-          elements={()=>{return Meteor.collection('Slogans').find({}, {sort: {vote: -1}})}}
-          renderRow={this.renderRow}
-        />  
+        return (
+            <View style={styles.container}>
+                <Button
+                    containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: '#EA526F'}}
+                    style={{fontSize: 20, color: 'white'}}
+                    onPress={() => this._handlePress()}>
+                    Back
+                </Button>     
+                
+                <MeteorComplexListView
+                style={styles.container}
+                elements={()=>{return Meteor.collection('Slogans').find({}, {sort: {slogan: -1}})}}
+                renderRow={this.renderRow}
+                />                  
+            </View>
+        );
+    }else{
         
-           
-      </View>
-    );
+        var allSlogans;
+        if(Meteor.collection('Elections').findOne() ){
+            
+            //an incomplete elections does not have allslogans. So we need to find with incomplete equals false
+            allSlogans =
+                <MeteorComplexListView
+                    style={styles.container}
+                    elements={ ()=>{ return Meteor.collection('Elections').find({incomplete:false}, {sort: {createdAt: -1}})[0].allSlogans} }
+                    renderRow={this.renderLastElectionRow}
+                />  ;
+        }else{
+            allSlogans = <Text>No Previous Election.</Text>
+        }
+        
+        var nextVoteCandidates;
+        if( Meteor.collection('Slogans').find({}).length >0 ){
+            nextVoteCandidates =  <MeteorComplexListView
+                    style={styles.container}
+                    elements={()=>{return Meteor.collection('Slogans').find({}, {sort: {vote: -1}})}}
+                    renderRow={this.renderCandidateRow}
+                />  
+        }else{
+            nextVoteCandidates = <Text>No next vote candidate yet.</Text>
+        }
+        
+        return (
+            <View style={styles.container}>
+                <Button
+                    containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: '#EA526F'}}
+                    style={{fontSize: 20, color: 'white'}}
+                    onPress={() => this._handlePress()}>
+                    Back
+                </Button>     
+                <Text>Current Vote Result</Text>
+                {allSlogans}
+                <Text>Next Vote Candidate</Text>
+                {nextVoteCandidates}
+                <Button
+                    containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: '#EA526F'}}
+                    style={{fontSize: 20, color: 'white'}}
+                    onPress={() => this._handleCallForVote()}>
+                    Call For Vote!
+                </Button>        
+                
+            </View>
+        );    
+            
+        
+    }
   }
 }
 
