@@ -45,17 +45,21 @@ Meteor.methods({
  
        //reset vote count
        Slogans.update({}, {$set: {vote:0, elected: false}}, { multi: true })
-             
-       var electId = Elections.insert({incomplete:true,createdAt:new Date()});
-       
-       Streamy.broadcast('callForVote', { data: 'callForVote' });
-       
 
-       
        //http://stackoverflow.com/questions/7687884/add-10-seconds-to-a-javascript-date-object-timeobject?lq=1
        //vote finish time = now + 30 seconds
        var voteFinishTime = new Date();
        voteFinishTime.setSeconds(voteFinishTime.getSeconds() + 30);
+                   
+       var electId = Elections.insert({incomplete:true,createdAt:new Date(),voteFinishTime: voteFinishTime});
+
+
+              
+       Streamy.broadcast('callForVote', { data: 'callForVote' });
+       
+
+       
+
        
        var job = new CronJob({
            cronTime: voteFinishTime,

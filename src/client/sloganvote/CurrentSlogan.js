@@ -12,6 +12,7 @@ import {
 import Button from 'react-native-button';
 import Meteor,{ connectMeteor, MeteorComplexListView } from 'react-native-meteor';
 import Sound from 'react-native-sound';
+import moment from 'moment';
 
 @connectMeteor
 export default class CurrentSlogan extends Component {
@@ -34,10 +35,21 @@ export default class CurrentSlogan extends Component {
     //binding function
     this.renderRow = this.renderRow.bind(this);
     this._handleUpVote = this._handleUpVote.bind(this);
-        
+    this.state = {timeLeftToVote: 0};
 
   }
-   
+  
+  componentDidMount(){
+      //this works. But it seems to be a poor implementation...
+      //http://stackoverflow.com/questions/31963803/create-timer-with-react-native-using-es6
+      setInterval(() =>{
+          var ongoingElection = Meteor.collection('Elections').findOne({incomplete:true});
+           if( ongoingElection ){
+            var secondsLeftToVoteFinish = moment(new Date(ongoingElection.voteFinishTime)).diff(new Date(),'seconds');
+            this.setState({timeLeftToVote: secondsLeftToVoteFinish })
+          }
+      },1000)
+  } 
      
   _handlePress() {
     this.props.navigator.push({id: 1,});
@@ -149,17 +161,17 @@ export default class CurrentSlogan extends Component {
         )
     }     
     
-    
-    if(Meteor.collection('Elections').findOne({incomplete:true})){
+    var ongoingElection = Meteor.collection('Elections').findOne({incomplete:true});
+    if( ongoingElection ){
     //if there is an on-going
-        
+                
         return (
             <View style={styles.container}>
                 <Button
                     containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: '#EA526F'}}
                     style={{fontSize: 20, color: 'white'}}
                     onPress={() => this._handlePress()}>
-                    Back
+                    Back ({this.state.timeLeftToVote})
                 </Button>     
                 
                 <MeteorComplexListView
