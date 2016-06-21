@@ -18,7 +18,7 @@ export default class Login extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {emailInput: props.initialEmail,passwordInput: props.initialPassword};
+    this.state = {userNameInput: props.initialUserName,passwordInput: props.initialPassword};
   }
 
   getMeteorData() {
@@ -30,23 +30,24 @@ export default class Login extends Component {
   }    
   
   _userRegister(){
-      console.log('_userRegister ',this.state.emailInput,' ',this.state.passwordInput);
-      Accounts.createUser({email: this.state.emailInput, password: this.state.passwordInput}, (err) => {
+      console.log('_userRegister ',this.state.userNameInput,' ',this.state.passwordInput);
+      Accounts.createUser({username: this.state.userNameInput, password: this.state.passwordInput}, (err) => {
         if (err) {
-           console.log({ error: err.reason, email: '', password: '' });
+           console.log({ error: err.reason, username: '', password: '' });
         } else {
-          console.log({ error: null, email: '', password: '' });
+          console.log({ error: null, username: '', password: '' });
+           Meteor.loginWithPassword(this.state.userNameInput, this.state.passwordInput);
         }
       });
   }
   
   _userLogin(){
-      console.log('_userLogin ',this.state.emailInput,' ',this.state.passwordInput);
-      Meteor.loginWithPassword(this.state.emailInput, this.state.passwordInput, (err) => {
+      console.log('_userLogin ',this.state.userNameInput,' ',this.state.passwordInput);
+      Meteor.loginWithPassword(this.state.userNameInput, this.state.passwordInput, (err) => {
         if (err) {
-          console.log({ error: err.reason, email: '', password: '' });
+          console.log({ error: err.reason, username: '', password: '' });
         } else {
-          console.log({ error: null, email: '', password: '' });
+          console.log({ error: null, username: '', password: '' });
         }
       });
   }
@@ -60,69 +61,90 @@ export default class Login extends Component {
      
     var logoutBtn;
     if(userId){
-         logoutBtn = <Button
-            containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden',borderColor:'white', borderRadius:2, backgroundColor: 'rgba(0,0,0,0)'}}
-            style={{fontSize: 20, color: 'white'}}
-            onPress={() => this._userLogout()}>
-            Logout
-        </Button>
+        return (
+          <View style={styles.container}>
+            <Button
+                containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden',borderColor:'white', borderRadius:2, backgroundColor: 'rgba(0,0,0,0)'}}
+                style={{fontSize: 20, color: 'white'}}
+                onPress={() => this._handlePress(1)}>
+                Back
+            </Button>
+            <Button
+                containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden',borderColor:'white', borderRadius:2, backgroundColor: 'rgba(0,0,0,0)'}}
+                style={{fontSize: 20, color: 'white'}}
+                onPress={() => this._handlePress(5)}>
+                My Groups
+            </Button>
+            <Button
+                containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden',borderColor:'white', borderRadius:2, backgroundColor: 'rgba(0,0,0,0)'}}
+                style={{fontSize: 20, color: 'white'}}
+                onPress={() => this._handlePress(5)}>
+                Join Group
+            </Button>                                              
+            <Button
+                containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden',borderColor:'white', borderRadius:2, backgroundColor: 'rgba(0,0,0,0)'}}
+                style={{fontSize: 20, color: 'white'}}
+                onPress={() => this._userLogout()}>
+                Logout
+            </Button>               
+          </View>  
+        );
+    }else{
+        return (
+        
+        <View style={styles.container}>
+            <Text  style={styles.welcome}>Register for private group vote</Text>
+            <Button
+                containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden',borderColor:'white', borderRadius:2, backgroundColor: 'rgba(0,0,0,0)'}}
+                style={{fontSize: 20, color: 'white'}}
+                onPress={() => this._handlePress(1)}>
+                Back
+            </Button>
+            <TextInput
+                ref={component => this._userNameInput = component}
+                style={styles.textEdit}
+                autoCapitalize= 'none'
+                onChangeText={(userNameInput) => this.setState({userNameInput})}
+                placeholder="Username"
+                placeholderTextColor='white'
+            /> 
+
+            <TextInput
+                ref={component => this._passwordInput = component}
+                style={styles.textEdit}
+                secureTextEntry={true}
+                onChangeText={(passwordInput) => this.setState({passwordInput})}
+                
+                placeholder="Password"
+                placeholderTextColor='white'
+            /> 
+                    
+            <Button
+                containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden',borderColor:'white', borderRadius:2, backgroundColor: 'rgba(0,0,0,0)'}}
+                style={{fontSize: 20, color: 'white'}}
+                onPress={() => this._userRegister()}>
+                Register
+            </Button>
+
+            <Button
+                containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden',borderColor:'white', borderRadius:2, backgroundColor: 'rgba(0,0,0,0)'}}
+                style={{fontSize: 20, color: 'white'}}
+                onPress={() => this._userLogin()}>
+                Login
+            </Button>
+
+                            
+        </View>
+        
+        );        
     }
       
-    return (
-      
-      <View style={styles.container}>
-        <Text  style={styles.welcome}>Register for private group vote</Text>
-        <Button
-            containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden',borderColor:'white', borderRadius:2, backgroundColor: 'rgba(0,0,0,0)'}}
-            style={{fontSize: 20, color: 'white'}}
-            onPress={() => this._handlePress(1)}>
-            Back
-        </Button>
-        <TextInput
-            ref={component => this._emailInput = component}
-            style={styles.textEdit}
-            autoCapitalize= 'none'
-            keyboardType = 'email-address'
-            onChangeText={(emailInput) => this.setState({emailInput})}
-            placeholder="Email"
-            placeholderTextColor='white'
-        /> 
 
-        <TextInput
-            ref={component => this._passwordInput = component}
-            style={styles.textEdit}
-            secureTextEntry={true}
-            onChangeText={(passwordInput) => this.setState({passwordInput})}
-            
-            placeholder="Password"
-            placeholderTextColor='white'
-        /> 
-                
-        <Button
-            containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden',borderColor:'white', borderRadius:2, backgroundColor: 'rgba(0,0,0,0)'}}
-            style={{fontSize: 20, color: 'white'}}
-            onPress={() => this._userRegister()}>
-            Register
-        </Button>
-
-        <Button
-            containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden',borderColor:'white', borderRadius:2, backgroundColor: 'rgba(0,0,0,0)'}}
-            style={{fontSize: 20, color: 'white'}}
-            onPress={() => this._userLogin()}>
-            Login
-        </Button>
-        
-        {logoutBtn}
-
-                        
-      </View>
-     
-    );
   }
 }
 
-Login.propTypes = { initialEmail: React.PropTypes.string, initialPassword : React.PropTypes.string};
-Login.defaultProps = { initialEmail: '', initialPassword:'' };
+Login.propTypes = { initialUserName: React.PropTypes.string, initialPassword : React.PropTypes.string};
+Login.defaultProps = { initialUserName: '', initialPassword:'' };
 
 const styles = StyleSheet.create({
   container: {

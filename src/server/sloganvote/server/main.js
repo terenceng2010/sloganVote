@@ -9,11 +9,19 @@ Meteor.startup(() => {
 
 Slogans = new Mongo.Collection('Slogans');
 Elections = new Mongo.Collection('Elections');
+Groups = new Mongo.Collection('Groups');
 
 Meteor.methods({
-   
-   addSlogan:function(sloganString){
-       Slogans.insert({slogan:sloganString});
+   createNewGroup:function(groupName){
+     Groups.insert({name:groupName,users:[Meteor.userId()],admins:[Meteor.userId()]});  
+   },
+   addSlogan:function(sloganString,groupId){
+       if(groupId){
+         Slogans.insert({ slogan:sloganString, group:groupId});            
+       }else{
+         Slogans.insert({slogan:sloganString, group:''});  
+       }
+
    },
    upVote:function(sloganId){
                      
@@ -100,10 +108,23 @@ Meteor.methods({
 
 Meteor.publish('slogans.public', function() {
   console.log('publish slogans.public');
-  return Slogans.find({});
+  return Slogans.find({group:''});
 });
 
 Meteor.publish('elections.public', function() {
   console.log('publish elections.public');
   return Elections.find({});
 });
+
+Meteor.publish('groups',function(){
+  console.log('publish groups ',this.userId);
+  return Groups.find({users:this.userId});
+});
+
+Meteor.publish('users',function(){
+  if(this.userId){
+    console.log('publish users ');
+    return Meteor.users.find({ _id: { $ne: this.userId }});   
+  }  
+
+})
