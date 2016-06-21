@@ -54,7 +54,7 @@ export default class NewSlogan extends Component {
                 Back
             </Button> 
             <Text style={styles.welcome}>
-            New Slogan
+            New Vote
             </Text>        
             <Button
                 containerStyle={{margin: 0,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: '#EA526F'}}
@@ -63,18 +63,12 @@ export default class NewSlogan extends Component {
                 Submit
             </Button>                
         </View>
-        <View style={styles.content}>      
-            <Image style={styles.contentBackgroundImage} resizeMode={Image.resizeMode.contain} source={require('./sign-post.png')}>
-                <Text style={styles.inputText}>{this.state.text}</Text>
-            </Image>
-                  
-        </View>
-            <TextInput
-                ref={component => this._textInput = component}
-                style={styles.textEdit}
-                onChangeText={(text) => this.setState({text})}
-                placeholder="What you gotta say?"
-            /> 
+        <TextInput
+            ref={component => this._textInput = component}
+            style={styles.textEdit}
+            onChangeText={(text) => this.setState({text})}
+            placeholder="What is the vote option?"
+        /> 
         
       </View>
     );

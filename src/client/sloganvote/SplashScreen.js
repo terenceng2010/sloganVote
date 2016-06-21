@@ -58,6 +58,14 @@ export default class SplashScreen extends Component {
             onPress={() => this._handlePress(3)}>
             Previous Vote & Candidate
         </Button>
+
+        <Button
+            containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden',borderColor:'white', borderRadius:2, backgroundColor: 'rgba(0,0,0,0)'}}
+            style={{fontSize: 20, color: 'white'}}
+            onPress={() => this._handlePress(4)}>
+            Register / Login
+        </Button>
+                
       </View>
      
     );
