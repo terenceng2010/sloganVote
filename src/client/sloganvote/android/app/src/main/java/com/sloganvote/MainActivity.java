@@ -1,4 +1,4 @@
-package com.sloganvote;
+package com.terenceng2010.votetage;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactPackage;

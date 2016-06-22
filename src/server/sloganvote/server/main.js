@@ -9,11 +9,32 @@ Meteor.startup(() => {
 
 Slogans = new Mongo.Collection('Slogans');
 Elections = new Mongo.Collection('Elections');
+Groups = new Mongo.Collection('Groups');
 
 Meteor.methods({
-   
-   addSlogan:function(sloganString){
-       Slogans.insert({slogan:sloganString});
+   createNewGroup:function(groupName){
+     Groups.insert({name:groupName,users:[Meteor.userId()],admins:[Meteor.userId()]});  
+   },
+   addUserToGroup:function(groupId,username){
+     //If caller is user of the group
+     if(Meteor.userId() && Groups.findOne({users: Meteor.userId()})){
+        var targetUser = Meteor.users.findOne({username: username});
+        Groups.update({_id:groupId},{$addToSet:{ users: targetUser._id}});
+     }
+   },
+   removeUserFromGroup:function(groupId,userId){
+     //If caller is admin of the group or caller tries to remove himself/herself from the group
+     if( ( Meteor.userId() && Groups.findOne({admins: Meteor.userId()}) ) || (Meteor.userId() === userId) ){
+        Groups.update({_id:groupId},{$pull:{ users: userId}});
+     }       
+   },
+   addSlogan:function(sloganString,groupId){
+       if(groupId){
+         Slogans.insert({ slogan:sloganString, group:groupId});            
+       }else{
+         Slogans.insert({slogan:sloganString, group:''});  
+       }
+
    },
    upVote:function(sloganId){
                      
@@ -45,17 +66,21 @@ Meteor.methods({
  
        //reset vote count
        Slogans.update({}, {$set: {vote:0, elected: false}}, { multi: true })
-             
-       var electId = Elections.insert({incomplete:true,createdAt:new Date()});
-       
-       Streamy.broadcast('callForVote', { data: 'callForVote' });
-       
 
-       
        //http://stackoverflow.com/questions/7687884/add-10-seconds-to-a-javascript-date-object-timeobject?lq=1
        //vote finish time = now + 30 seconds
        var voteFinishTime = new Date();
        voteFinishTime.setSeconds(voteFinishTime.getSeconds() + 30);
+                   
+       var electId = Elections.insert({incomplete:true,createdAt:new Date(),voteFinishTime: voteFinishTime});
+
+
+              
+       Streamy.broadcast('callForVote', { data: 'callForVote' });
+       
+
+       
+
        
        var job = new CronJob({
            cronTime: voteFinishTime,
@@ -96,10 +121,24 @@ Meteor.methods({
 
 Meteor.publish('slogans.public', function() {
   console.log('publish slogans.public');
-  return Slogans.find({});
+  return Slogans.find({group:''});
 });
 
 Meteor.publish('elections.public', function() {
   console.log('publish elections.public');
   return Elections.find({});
 });
+
+Meteor.publish('groups',function(){
+  console.log('publish groups ',this.userId);
+  
+  return Groups.find({ $or: [ { users: this.userId }, { admins: this.userId  } ] });
+});
+
+Meteor.publish('users',function(){
+  if(this.userId){
+    console.log('publish users ');
+    return Meteor.users.find({ _id: { $ne: this.userId }});   
+  }  
+
+})

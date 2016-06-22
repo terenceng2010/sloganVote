@@ -20,6 +20,9 @@ import Sound from 'react-native-sound';
 import SplashScreen from './SplashScreen';
 import CurrentSlogan from './CurrentSlogan';
 import NewSlogan from './NewSlogan';
+import Login from './Login';
+import NewGroup from './NewGroup';
+import ViewGroup from './ViewGroup';
 
 Meteor.connect('ws://192.168.1.82:3000/websocket');//do this only once
 Meteor.ddp.on("streamy", message => {
@@ -62,8 +65,17 @@ class sloganvote extends Component {
     }
     if (route.id === 3) {
       return <CurrentSlogan navigator={navigator} />
+    }
+    if (route.id === 4){
+      return <Login navigator={navigator} />
+    }
+    if (route.id === 5){
+      return <NewGroup navigator={navigator} />
+    }
+    if (route.id === 6){
+      console.log(route.groupId)
+      return <ViewGroup groupId={route.groupId} navigator={navigator} />
     }    
-        
   }
         
   render() {
