@@ -15,6 +15,19 @@ Meteor.methods({
    createNewGroup:function(groupName){
      Groups.insert({name:groupName,users:[Meteor.userId()],admins:[Meteor.userId()]});  
    },
+   addUserToGroup:function(groupId,username){
+     //If caller is user of the group
+     if(Meteor.userId() && Groups.findOne({users: Meteor.userId()})){
+        var targetUser = Meteor.users.findOne({username: username});
+        Groups.update({_id:groupId},{$addToSet:{ users: targetUser._id}});
+     }
+   },
+   removeUserFromGroup:function(groupId,userId){
+     //If caller is admin of the group or caller tries to remove himself/herself from the group
+     if( ( Meteor.userId() && Groups.findOne({admins: Meteor.userId()}) ) || (Meteor.userId() === userId) ){
+        Groups.update({_id:groupId},{$pull:{ users: userId}});
+     }       
+   },
    addSlogan:function(sloganString,groupId){
        if(groupId){
          Slogans.insert({ slogan:sloganString, group:groupId});            
@@ -118,7 +131,8 @@ Meteor.publish('elections.public', function() {
 
 Meteor.publish('groups',function(){
   console.log('publish groups ',this.userId);
-  return Groups.find({users:this.userId});
+  
+  return Groups.find({ $or: [ { users: this.userId }, { admins: this.userId  } ] });
 });
 
 Meteor.publish('users',function(){
