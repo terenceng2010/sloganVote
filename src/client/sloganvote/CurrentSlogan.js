@@ -176,9 +176,11 @@ export default class CurrentSlogan extends Component {
                 
         return (
             <View style={styles.container}>
+            
                 <Button
                     containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: '#EA526F'}}
                     style={{fontSize: 20, color: 'white'}}
+                    onPress={() => this._handlePress()}
                     >
                     Time Remain ({this.state.timeLeftToVote})
                 </Button>     

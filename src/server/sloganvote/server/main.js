@@ -81,8 +81,11 @@ Meteor.methods({
           targetGroup = Groups.findOne({_id: groupId});
           targetGroup.users.map(function(eachUserId){
              var s = Streamy.socketsForUsers(eachUserId);
+             
              if(s){
-               Streamy.emit('callForVote', { data: 'callForVote' }, s);                 
+                s._sockets.map(function(eachSocket){
+                    Streamy.emit('callForVote', { data: 'callForVote', groupId: groupId }, eachSocket);   
+                });                 
              }
           });
        }

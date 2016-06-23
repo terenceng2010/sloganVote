@@ -26,37 +26,60 @@ import ViewGroup from './ViewGroup';
 import CurrentSloganTabView from './CurrentSloganTabView';
 
 Meteor.connect('ws://192.168.1.82:3000/websocket');//do this only once
-Meteor.ddp.on("streamy", message => {
-    //console.log('a streamy msg', message.data);
-    if(message.data === 'callForVote'){
-        Alert.alert(
-                'Call for Vote!',
-                '要求表決!',
-            );  
-            
-    var initialDrum = new Sound('initialdrum.wav', Sound.MAIN_BUNDLE, (error) => {
-        if (error) {
-            console.log('failed to load the sound', error);
-        } else { // loaded successfully
-            //console.log('duration in seconds: ' + initialDrum.getDuration() + 'number of channels: ' + initialDrum.getNumberOfChannels());
-            initialDrum.play(function(){
-                
-                //Release the audio player resource
-                initialDrum.release();
-            });
-        }
-    });            
-   }
-   
-   if(message.data === 'voteEnd'){
-        Alert.alert(
-                'Vote ends',
-                'Vote ends',
-            ); 
-   }
-});
+
 class sloganvote extends Component {
 
+  constructor(props) {
+    super(props);
+    
+    Meteor.ddp.on("streamy", (message) => {
+        //console.log('a streamy msg', message.data);
+        if(message.data === 'callForVote'){
+            
+            Alert.alert(
+                    'Call for Vote!' + message.groupId,
+                    '要求表決!',
+                    [
+                        {text: 'OK', onPress: () => {
+                                if(message.groupId){
+                                    //need to have better implementation
+                                    //this.refs.navigator.push({id: 3, groupId: message.groupId  }); 
+                                }else{ 
+                                    //this.refs.navigator.push({id: 3, groupId: ""});
+                                    //do nothing
+                                } 
+                             
+                           }
+                        
+                            
+                        },
+                    ]
+                );  
+                
+        var initialDrum = new Sound('initialdrum.wav', Sound.MAIN_BUNDLE, (error) => {
+            if (error) {
+                console.log('failed to load the sound', error);
+            } else { // loaded successfully
+                //console.log('duration in seconds: ' + initialDrum.getDuration() + 'number of channels: ' + initialDrum.getNumberOfChannels());
+                initialDrum.play(function(){
+                    
+                    //Release the audio player resource
+                    initialDrum.release();
+                });
+            }
+        });            
+    }
+    
+    if(message.data === 'voteEnd'){
+            Alert.alert(
+                    'Vote ends',
+                    'Vote ends',
+                ); 
+    }
+    });  
+        
+  }
+  
   _renderScene(route, navigator) {
     if (route.id === 1) {
       return <SplashScreen navigator={navigator} />
@@ -89,6 +112,7 @@ class sloganvote extends Component {
   render() {
     return (
       <Navigator
+        ref="navigator"
         initialRoute={{id: 1, }}
         renderScene={this._renderScene} />
     );
