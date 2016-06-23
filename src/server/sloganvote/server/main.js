@@ -43,21 +43,21 @@ Meteor.methods({
           { $inc : {vote:1} } 
        )
    },
-   callForVote:function(){
+   callForVote:function(groupId){
        
-       if(Elections.find({incomplete:true}).count() > 0 ){
+       if(Elections.find({group:groupId, incomplete:true}).count() > 0 ){
            console.log('There is a election right now');
             return {line1:'There is a election right now',line2:''};
        }
 
-       var previousValidElection = Elections.findOne( { validUntil:{ $gte: new Date() } } )
+       var previousValidElection = Elections.findOne( {group:groupId, validUntil:{ $gte: new Date() } } )
        if(previousValidElection){
            console.log('The previous election is still valid until: ', previousValidElection.validUntil);
         
          return {line1:'The previous election is still valid until:',line2: new Date(previousValidElection.validUntil).toTimeString() };
        }
               
-       if(Slogans.find().count() == 0){
+       if(Slogans.find({group:groupId}).count() == 0){
            console.log('There should be at least one candidate to vote for');
             return {line1:'There should be at least one candidate to vote for',line2:''};           
        }
@@ -65,19 +65,27 @@ Meteor.methods({
 
  
        //reset vote count
-       Slogans.update({}, {$set: {vote:0, elected: false}}, { multi: true })
+       Slogans.update({group:groupId}, {$set: {vote:0, elected: false}}, { multi: true })
 
        //http://stackoverflow.com/questions/7687884/add-10-seconds-to-a-javascript-date-object-timeobject?lq=1
        //vote finish time = now + 30 seconds
        var voteFinishTime = new Date();
        voteFinishTime.setSeconds(voteFinishTime.getSeconds() + 30);
                    
-       var electId = Elections.insert({incomplete:true,createdAt:new Date(),voteFinishTime: voteFinishTime});
+       var electId = Elections.insert({group:groupId,incomplete:true,createdAt:new Date(),voteFinishTime: voteFinishTime});
 
-
-              
-       Streamy.broadcast('callForVote', { data: 'callForVote' });
        
+       if(groupId === ''){
+          Streamy.broadcast('callForVote', { data: 'callForVote' });
+       }else{
+          targetGroup = Groups.findOne({_id: groupId});
+          targetGroup.users.map(function(eachUserId){
+             var s = Streamy.socketsForUsers(eachUserId);
+             if(s){
+               Streamy.emit('callForVote', { data: 'callForVote' }, s);                 
+             }
+          });
+       }
 
        
 
@@ -98,18 +106,19 @@ Meteor.methods({
                var validUntil = new Date();
                validUntil.setMinutes(validUntil.getMinutes() + 1);               
                
-               var voteResult = Slogans.find({}, {sort: {vote: -1}}).fetch();
+               //find the slogan with the most vote, set it as elected
+               var voteResult = Slogans.find({group: groupId}, {sort: {vote: -1}}).fetch();
                console.log('voteResult',voteResult);
                Slogans.update({_id: voteResult[0]._id},{$set: { elected:true}});
                
                //copy the election's slogans to election obj.
-               var allSlogansResult = Slogans.find({}, {sort: {vote: -1}}).fetch();
+               var allSlogansResult = Slogans.find({group: groupId}, {sort: {vote: -1}}).fetch();
                Elections.update({_id: electId},{$set:{ incomplete:false, validUntil: validUntil, allSlogans: allSlogansResult} } );
                
-               //remove all slogans from slogans collection
-               Slogans.remove({});
+               //remove all slogans from slogans collection of the group
+               Slogans.remove({group: groupId});
                
-               Streamy.broadcast('callForVote', { data: 'voteEnd' });
+               //Streamy.broadcast('callForVote', { data: 'voteEnd' });
            }),
            start: false,
            timeZone: 'Asia/Hong_Kong'
@@ -119,14 +128,28 @@ Meteor.methods({
     
 });
 
-Meteor.publish('slogans.public', function() {
-  console.log('publish slogans.public');
-  return Slogans.find({group:''});
+Meteor.publish('slogans', function(groupId) {
+  
+  if(!this.userId){
+    console.log('publish slogans.public');
+    return Slogans.find({group:''});  
+  }else{
+    console.log('publish slogans.private',groupId);
+    return Slogans.find({group:groupId});        
+  }
+
 });
 
-Meteor.publish('elections.public', function() {
-  console.log('publish elections.public');
-  return Elections.find({});
+Meteor.publish('elections', function(groupId) {
+
+  if(!this.userId){
+    console.log('publish elections.public');
+    return Elections.find({group:''});
+  }else{
+    console.log('publish elections.private',groupId);
+    return Elections.find({group:groupId});      
+  }
+ 
 });
 
 Meteor.publish('groups',function(){

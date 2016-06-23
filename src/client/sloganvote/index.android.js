@@ -23,6 +23,7 @@ import NewSlogan from './NewSlogan';
 import Login from './Login';
 import NewGroup from './NewGroup';
 import ViewGroup from './ViewGroup';
+import CurrentSloganTabView from './CurrentSloganTabView';
 
 Meteor.connect('ws://192.168.1.82:3000/websocket');//do this only once
 Meteor.ddp.on("streamy", message => {
@@ -64,7 +65,11 @@ class sloganvote extends Component {
       return <NewSlogan navigator={navigator} />
     }
     if (route.id === 3) {
-      return <CurrentSlogan navigator={navigator} />
+      if(route.groupId){
+        return <CurrentSlogan groupId={route.groupId} navigator={navigator} />  
+      }else{
+        return <CurrentSlogan navigator={navigator} />
+      }
     }
     if (route.id === 4){
       return <Login navigator={navigator} />
@@ -75,6 +80,9 @@ class sloganvote extends Component {
     if (route.id === 6){
       console.log(route.groupId)
       return <ViewGroup groupId={route.groupId} navigator={navigator} />
+    }
+    if (route.id === 7){
+      return <CurrentSloganTabView navigator={navigator} />  
     }    
   }
         
