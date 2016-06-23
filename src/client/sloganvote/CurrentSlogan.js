@@ -35,6 +35,7 @@ export default class CurrentSlogan extends Component {
     //http://stackoverflow.com/questions/29532926/this-value-is-null-in-function-react-native
     //binding function
     this.renderRow = this.renderRow.bind(this);
+    this.renderLastElectionRow = this.renderLastElectionRow.bind(this);
     this._handleUpVote = this._handleUpVote.bind(this);
     this.state = {timeLeftToVote: 0};
 
@@ -43,15 +44,20 @@ export default class CurrentSlogan extends Component {
   componentDidMount(){
       //this works. But it seems to be a poor implementation...
       //http://stackoverflow.com/questions/31963803/create-timer-with-react-native-using-es6
-      setInterval(() =>{
+      var intervalId = setInterval(() =>{
           var ongoingElection = Meteor.collection('Elections').findOne({incomplete:true});
            if( ongoingElection ){
             var secondsLeftToVoteFinish = moment(new Date(ongoingElection.voteFinishTime)).diff(new Date(),'seconds');
             this.setState({timeLeftToVote: secondsLeftToVoteFinish })
           }
-      },1000)
+      },1000);
+      this.setState({intervalId: intervalId});
   } 
-     
+  
+  componentWillUnmount(){
+    clearInterval(this.state.intervalId);
+  }
+  
   _handlePress() {
     this.props.navigator.push({id: 1,});
   }
@@ -128,7 +134,8 @@ export default class CurrentSlogan extends Component {
             <Button
                 containerStyle={{flex:0.3}}
                 style={{fontSize: 20, color: 'black' }}
-                >
+                onPress={() => this._handleUpVote(slogan._id) }>
+                
                 👍 ({slogan.vote ? slogan.vote : 0})
             </Button>
         </View>
@@ -192,7 +199,11 @@ export default class CurrentSlogan extends Component {
             allSlogans =
                 <MeteorComplexListView
                     style={styles.container}
-                    elements={ ()=>{ return Meteor.collection('Elections').find({ group: this.props.groupId, incomplete:false}, {sort: {createdAt: -1}})[0].allSlogans} }
+                    elements={ ()=>{ if( !Meteor.collection('Elections').findOne( {group: this.props.groupId, incomplete:true} ) ) { 
+                                      return Meteor.collection('Elections').find({ group: this.props.groupId, incomplete:false}, {sort: {createdAt: -1}})[0].allSlogans}
+                                      else{ return Meteor.collection('Slogans').find({group: this.props.groupId}, {sort: {slogan: -1}}) }
+                                    }
+                              }
                     renderRow={this.renderLastElectionRow}
                 />  ;
         }else{
