@@ -41,7 +41,7 @@ class sloganvote extends Component {
                     '要求表決!',
                     [
                         {text: 'OK', onPress: () => {                          
-                                    this.refs.navigator.push({id: 7, groupId: message.groupId || ""})             
+                                    this.refs.navigator.replace({id: 7, groupId: message.groupId || ""})             
                            }
                         
                             

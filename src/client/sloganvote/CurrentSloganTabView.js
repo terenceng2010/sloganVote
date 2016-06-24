@@ -31,7 +31,7 @@ export default class CurrentSloganTabView extends Component {
   }
        
   _handlePress() {
-    this.props.navigator.push({id: 1,});
+    this.props.navigator.replace({id: 1,});
   }      
   render() {
         var userGroups = Meteor.collection('Groups').find();
