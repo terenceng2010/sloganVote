@@ -23,6 +23,3 @@ TBD
 * React Native (client)
 * Meteor (server)
 
-## Limitation
-* The current implementation show slogans sort by their number of votes only. I hope to make it more like the one in TF2
-* user record is not yet added.
