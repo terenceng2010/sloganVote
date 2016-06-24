@@ -35,7 +35,21 @@ export default class CurrentSloganTabView extends Component {
   }      
   render() {
         var userGroups = Meteor.collection('Groups').find();
-        
+
+        var initialPageIndex = 0;
+        if(this.props.groupId === ''){
+            initialPageIndex = 0;
+        }else{
+            var privateGroupIndex = userGroups.findIndex((eachGroup) => {
+                
+                return eachGroup._id === this.props.groupId
+                
+            });
+            
+            //because public group is always the first index, we must plus one the index of the private group
+            initialPageIndex = privateGroupIndex + 1;
+        }  
+                
         var allGroups = [];
         allGroups.push( <CurrentSlogan key={-1} groupId="" tabLabel='Public'/> );
         
@@ -43,7 +57,8 @@ export default class CurrentSloganTabView extends Component {
             return <CurrentSlogan key={index} groupId={eachUserGroup._id} tabLabel={eachUserGroup.name}/>
         });
         allGroups = allGroups.concat(userGroups);
-                   
+        
+      
      return (
           <View  style={styles.mainContainer}>
             <Button
@@ -52,7 +67,7 @@ export default class CurrentSloganTabView extends Component {
                 onPress={() => this._handlePress()}>
                 Back
             </Button>
-            <ScrollableTabView>
+            <ScrollableTabView initialPage={initialPageIndex}>
                 {allGroups}
             </ScrollableTabView>       
                       

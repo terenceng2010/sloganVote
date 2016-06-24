@@ -38,6 +38,8 @@ export default class ViewGroup extends Component {
   
 
   _addUserToGroup(groupId){
+    
+    console.log("_addUserToGroup", groupId, this.state.userNameInput);
     Meteor.call('addUserToGroup',groupId,this.state.userNameInput);
   }
   

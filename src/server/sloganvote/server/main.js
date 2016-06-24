@@ -16,9 +16,10 @@ Meteor.methods({
      Groups.insert({name:groupName,users:[Meteor.userId()],admins:[Meteor.userId()]});  
    },
    addUserToGroup:function(groupId,username){
+     console.log('addUserToGroup',groupId,username);
      //If caller is user of the group
-     if(Meteor.userId() && Groups.findOne({users: Meteor.userId()})){
-        var targetUser = Meteor.users.findOne({username: username});
+     if(Meteor.userId() && Groups.findOne({ $or: [ { users: Meteor.userId() }, { admins: Meteor.userId()  } ] })){
+        var targetUser = Meteor.users.findOne({username: username.trim()});
         Groups.update({_id:groupId},{$addToSet:{ users: targetUser._id}});
      }
    },

@@ -40,15 +40,8 @@ class sloganvote extends Component {
                     'Call for Vote!' + message.groupId,
                     '要求表決!',
                     [
-                        {text: 'OK', onPress: () => {
-                                if(message.groupId){
-                                    //need to have better implementation
-                                    //this.refs.navigator.push({id: 3, groupId: message.groupId  }); 
-                                }else{ 
-                                    //this.refs.navigator.push({id: 3, groupId: ""});
-                                    //do nothing
-                                } 
-                             
+                        {text: 'OK', onPress: () => {                          
+                                    this.refs.navigator.push({id: 7, groupId: message.groupId || ""})             
                            }
                         
                             
@@ -105,7 +98,8 @@ class sloganvote extends Component {
       return <ViewGroup groupId={route.groupId} navigator={navigator} />
     }
     if (route.id === 7){
-      return <CurrentSloganTabView navigator={navigator} />  
+      return <CurrentSloganTabView groupId={route.groupId} navigator={navigator} />      
+  
     }    
   }
         
