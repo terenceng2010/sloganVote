@@ -7,7 +7,8 @@ import {
   Text,
   View,
   ListView,
-  Alert, 
+  Alert,
+  ToastAndroid  
 } from 'react-native';
 import Button from 'react-native-button';
 import Meteor,{ connectMeteor, MeteorComplexListView } from 'react-native-meteor';
@@ -34,6 +35,12 @@ export default class CurrentSloganTabView extends Component {
     this.props.navigator.replace({id: 1,});
   }      
   render() {
+        
+        var connectionStatus = Meteor.status().connected;
+        if(!connectionStatus){
+              ToastAndroid.show('No connection to server now', ToastAndroid.SHORT)            
+        }
+        
         var userGroups = Meteor.collection('Groups').find();
 
         var initialPageIndex = 0;
