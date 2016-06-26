@@ -25,5 +25,6 @@ TBD
 
 ## TODO
 * UI revamp to more user friendly
+* simplify how to add user to a group (e.g either by QR code or by invitation code)
 * improve app stability in weak network signal environment
 * allow one group to have mutliple pending elections
