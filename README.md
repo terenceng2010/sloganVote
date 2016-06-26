@@ -23,3 +23,7 @@ TBD
 * React Native (client)
 * Meteor (server)
 
+## TODO
+* UI revamp to more user friendly
+* improve app stability in weak network signal environment
+* allow one group to have mutliple pending elections
