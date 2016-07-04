@@ -23,13 +23,7 @@ export default class NewGroup extends Component {
     this.renderGroup = this.renderGroup.bind(this);
   }
 
-  getMeteorData() {
-      const groupsHandle = Meteor.subscribe('groups');
-      return { 
-          userId: Meteor.userId(),
-          groupsReady : groupsHandle.ready()
-      };
-  }
+
       
   _handlePress(sceneIndex,groupId) {
       
@@ -53,23 +47,14 @@ export default class NewGroup extends Component {
     );
   }
         
-  render() {
-     const { userId,groupsReady } = this.data;
-        
+  render() {        
         var myGroups;
-        if (!groupsReady) {
-            myGroups =
-                <View>
-                    <Text>Loading...</Text>
-                </View>
-            
-        }else{
             myGroups =
                 <MeteorComplexListView
                                     elements={()=>{return Meteor.collection('Groups').find({})}}
                                     renderRow={this.renderGroup}
                                 />             
-        }  
+        
         return (
         
         <View style={styles.container}>

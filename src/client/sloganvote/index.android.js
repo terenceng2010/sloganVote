@@ -14,7 +14,7 @@ import {
   Alert
 } from 'react-native';
 
-import Meteor, { createContainer } from 'react-native-meteor';
+import Meteor, { connectMeteor, Accounts, MeteorComplexListView } from 'react-native-meteor';
 import Sound from 'react-native-sound';
 
 import SplashScreen from './SplashScreen';
@@ -27,6 +27,7 @@ import CurrentSloganTabView from './CurrentSloganTabView';
 
 Meteor.connect('ws://192.168.1.82:3000/websocket');//do this only once
 
+@connectMeteor
 class sloganvote extends Component {
 
   constructor(props) {
@@ -72,7 +73,17 @@ class sloganvote extends Component {
     });  
         
   }
-  
+
+  getMeteorData() {
+      const groupsHandle = Meteor.subscribe('groups');
+      const usersHandle  = Meteor.subscribe('users');
+      return { 
+          userId: Meteor.userId(),
+          groupsReady : groupsHandle.ready(),
+          usersReady  : usersHandle.ready()
+      };
+  }
+    
   _renderScene(route, navigator) {
     if (route.id === 1) {
       return <SplashScreen navigator={navigator} />
@@ -104,6 +115,9 @@ class sloganvote extends Component {
   }
         
   render() {
+
+    const { userId,groupsReady } = this.data;
+           
     return (
       <Navigator
         ref="navigator"
@@ -133,4 +147,3 @@ const styles = StyleSheet.create({
 });
 
 AppRegistry.registerComponent('sloganvote', () => sloganvote);
-
