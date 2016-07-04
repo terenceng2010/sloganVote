@@ -9,19 +9,27 @@ import {
   Image,
   TextInput,
   Alert,
-  Dimensions
+  Dimensions,
+  Picker
 } from 'react-native';
 import Button from 'react-native-button';
-import Meteor, { createContainer } from 'react-native-meteor';
+import Meteor, { connectMeteor, createContainer } from 'react-native-meteor';
 
+@connectMeteor
 export default class NewSlogan extends Component {
    
 
   constructor(props) {
     super(props);
-    this.state = {text: props.initialText};
+    this.state = {text: props.initialText, group: props.initialGroup};
   }
-  
+
+  getMeteorData() {
+      const groupsHandle = Meteor.subscribe('groups');
+      return { 
+          groupsReady : groupsHandle.ready()
+      };
+  }  
     
   _handlePress() {
     this.props.navigator.push({id: 1,});
@@ -32,7 +40,7 @@ export default class NewSlogan extends Component {
             'Your new slogan is submited',
             this.state.text,
         );
-    Meteor.call('addSlogan',this.state.text);
+    Meteor.call('addSlogan',this.state.text, this.state.group);
     
     //set text to '' so that no text is displayed on the sign post
     //http://stackoverflow.com/questions/30852251/react-native-this-setstate-not-working
@@ -44,6 +52,27 @@ export default class NewSlogan extends Component {
   }
   
   render() {
+    
+    const { groupsReady } = this.data;
+    
+    var loggedIn
+    if(Meteor.userId() && groupsReady){
+        var userGroups = Meteor.collection('Groups').find();
+        
+        var allGroups = [];
+        allGroups.push( <Picker.Item key={0} label="Public" value="" /> );
+        
+        userGroups = userGroups.map(function(eachUserGroup,index){
+            return <Picker.Item key={index} label={eachUserGroup.name} value={eachUserGroup._id} />
+        });
+        allGroups = allGroups.concat(userGroups);
+        
+        loggedIn = <Picker selectedValue={this.state.group} onValueChange={(groupId) => this.setState({ group: groupId }) }>
+                         {allGroups}        
+                    </Picker>  
+    }else{
+        loggedIn = <Text> </Text>
+    }
     return (
       <View  style={styles.mainContainer}>
         <View style={styles.toolbar}>
@@ -69,7 +98,7 @@ export default class NewSlogan extends Component {
             onChangeText={(text) => this.setState({text})}
             placeholder="What is the vote option?"
         /> 
-        
+        {loggedIn}
       </View>
     );
   }
@@ -77,8 +106,8 @@ export default class NewSlogan extends Component {
 
 var width = Dimensions.get('window').width ; //full width
 var height = Dimensions.get('window').height ; //full height   
-NewSlogan.propTypes = { initialText: React.PropTypes.string };
-NewSlogan.defaultProps = { initialText: '' };
+NewSlogan.propTypes = { initialText: React.PropTypes.string, initialGroup: React.PropTypes.string };
+NewSlogan.defaultProps = { initialText: '', initialGroup: '' };
 
 const styles = StyleSheet.create({
     mainContainer:{

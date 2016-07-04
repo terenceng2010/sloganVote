@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Text,
   View,
-  Image,
   TextInput,  
 } from 'react-native';
 import Button from 'react-native-button';
@@ -21,16 +20,6 @@ export default class ViewGroup extends Component {
     this.state = {userNameInput: props.initialUserName};
   
   }
-
-  getMeteorData() {
-      const groupsHandle = Meteor.subscribe('groups');
-      const usersHandle  = Meteor.subscribe('users');
-      return { 
-          userId: Meteor.userId(),
-          groupsReady : groupsHandle.ready(),
-          usersReady  : usersHandle.ready()
-      };
-  }
       
   _handlePress(sceneIndex) {
      this.props.navigator.push({id: sceneIndex,});
@@ -38,6 +27,8 @@ export default class ViewGroup extends Component {
   
 
   _addUserToGroup(groupId){
+    
+    console.log("_addUserToGroup", groupId, this.state.userNameInput);
     Meteor.call('addUserToGroup',groupId,this.state.userNameInput);
   }
   
@@ -45,28 +36,36 @@ export default class ViewGroup extends Component {
   renderGroup(group) {
  
      var admins = group.admins.map(function(eachUserId,index){
-        let userObj = Meteor.collection('users').find({_id:eachUserId});
-        console.log('userObj',userObj);
-        return <View  key={index}><Text style={{fontSize: 20, color: 'white',textAlign: 'center',}}> {userObj[0].username} (admin) </Text></View>
+        let users = Meteor.collection('users').find({_id:eachUserId});
+        console.log('users',users);
+
+        if(users.length === 0){
+            return <Text style={{fontSize: 20, color: 'white',textAlign: 'center', flex:0.5}}> No Admin</Text>
+        }else{
+           return <View  key={index}><Text style={{fontSize: 20, color: 'white',textAlign: 'center',}}> {users[0].username} (admin) </Text></View>
+        }
     });
        
     var users = group.users.map(function(eachUserId,index){
-        let userObj = Meteor.collection('users').find({_id:eachUserId});
+        let users = Meteor.collection('users').find({_id:eachUserId});
         
-        if(!userObj){
+        console.log('users',users);
+        if(users.length === 0){
             return <Text style={{fontSize: 20, color: 'white',textAlign: 'center', flex:0.5}}> No User</Text>
+        }else{
+            return <View key={index} style={{flexDirection:'row'}}>
+                    <Text style={{fontSize: 20, color: 'white',textAlign: 'center', flex:0.5}}> {users[0].username}</Text>
+                    <Button
+                        containerStyle={{ height:20, overflow:'hidden',borderColor:'white', borderRadius:2, backgroundColor: 'rgba(0,0,0,0)', flex:0.5}}
+                        style={{fontSize: 20, color: '#EA526F'}}
+                        onPress={() =>  Meteor.call('removeUserFromGroup',group._id ,eachUserId) }>
+                        -
+                    </Button>                 
+                </View>           
         }
         
-        console.log('userObj',userObj[0]);
-        return <View key={index} style={{flexDirection:'row'}}>
-                 <Text style={{fontSize: 20, color: 'white',textAlign: 'center', flex:0.5}}> {userObj[0].username}</Text>
-                 <Button
-                    containerStyle={{ height:20, overflow:'hidden',borderColor:'white', borderRadius:2, backgroundColor: 'rgba(0,0,0,0)', flex:0.5}}
-                    style={{fontSize: 20, color: '#EA526F'}}
-                    onPress={() =>  Meteor.call('removeUserFromGroup',group._id ,eachUserId) }>
-                    -
-                 </Button>                 
-               </View>
+        
+
       
     });
     
@@ -84,26 +83,16 @@ export default class ViewGroup extends Component {
     );
   }
         
-  render() {
-     const { userId,groupsReady,usersReady } = this.data;
-        
+  render() {        
         var myGroups;
         console.log('groupId', this.props.groupId);
-        var groupId = this.props.groupId;
-        if (!groupsReady && !usersReady) {
-            myGroups =
-                <View>
-                    <Text  style={{fontSize: 20, color: 'white',textAlign: 'center',}}>Loading...</Text>
-                </View>
-            
-        }else{
-            
+        var groupId = this.props.groupId;            
             myGroups =
                 <MeteorComplexListView
                                     elements={()=>{return Meteor.collection('Groups').find({_id: groupId})}}
                                     renderRow={this.renderGroup}
                                 />             
-        }  
+         
         return (
         
         <View style={styles.container}>

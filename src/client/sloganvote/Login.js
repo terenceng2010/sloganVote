@@ -7,7 +7,8 @@ import {
   Text,
   View,
   Image,
-  TextInput,  
+  TextInput,
+  ToastAndroid
 } from 'react-native';
 import Button from 'react-native-button';
 import Meteor,{ connectMeteor, Accounts } from 'react-native-meteor';
@@ -58,7 +59,12 @@ export default class Login extends Component {
     
   render() {
      const { userId } = this.data;
-     
+ 
+     var connectionStatus = Meteor.status().connected;
+     if (!connectionStatus) {
+         ToastAndroid.show('No connection to server now', ToastAndroid.SHORT)
+     }
+            
     var logoutBtn;
     if(userId){
         return (
