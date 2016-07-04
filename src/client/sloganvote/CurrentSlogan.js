@@ -7,7 +7,8 @@ import {
   Text,
   View,
   ListView,
-  Alert
+  Alert,
+  TextInput,  
 } from 'react-native';
 import Button from 'react-native-button';
 import Meteor,{ connectMeteor, MeteorComplexListView } from 'react-native-meteor';
@@ -37,7 +38,7 @@ export default class CurrentSlogan extends Component {
     this.renderRow = this.renderRow.bind(this);
     this.renderLastElectionRow = this.renderLastElectionRow.bind(this);
     this._handleUpVote = this._handleUpVote.bind(this);
-    this.state = {timeLeftToVote: 0};
+    this.state = {timeLeftToVote: 0,text: props.initialText};
 
   }
   
@@ -94,7 +95,23 @@ export default class CurrentSlogan extends Component {
         }
     });
   }
+ 
+   submitText(){
+    Alert.alert(
+            'Your new slogan is submited',
+            this.state.text,
+        );
+    Meteor.call('addSlogan',this.state.text, this.props.groupId);
     
+    //set text to '' so that no text is displayed on the sign post
+    //http://stackoverflow.com/questions/30852251/react-native-this-setstate-not-working
+    this.setState({text:''});
+    
+    //setNativeProps to clear TextInput value
+    //https://facebook.github.io/react-native/docs/direct-manipulation.html
+    this._textInput.setNativeProps({text: ''});
+  }
+     
   renderRow(slogan) {
     
     var sloganText;
@@ -235,6 +252,20 @@ export default class CurrentSlogan extends Component {
                 {allSlogans}
                 <Text>Next Vote Candidate</Text>
                 {nextVoteCandidates}
+                
+                <TextInput
+                    ref={component => this._textInput = component}
+                    style={styles.textEdit}
+                    onChangeText={(text) => this.setState({text})}
+                    placeholder="What is the vote option?"
+                />
+                <Button
+                    containerStyle={{margin: 0,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: '#EA526F'}}
+                    style={{fontSize: 20, color: 'white'}}
+                    onPress={() => this.submitText()}>
+                    Submit
+                </Button>   
+                                              
                 <Button
                     containerStyle={{margin: 10,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: '#EA526F'}}
                     style={{fontSize: 20, color: 'white'}}
@@ -249,6 +280,9 @@ export default class CurrentSlogan extends Component {
     }
   }
 }
+
+CurrentSlogan.propTypes = { initialText: React.PropTypes.string };
+CurrentSlogan.defaultProps = { initialText: '' };
 
 const styles = StyleSheet.create({
   renderRow: {
