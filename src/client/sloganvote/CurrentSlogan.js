@@ -202,7 +202,13 @@ export default class CurrentSlogan extends Component {
                 <MeteorComplexListView
                     style={styles.container}
                     elements={ ()=>{ if( !Meteor.collection('Elections').findOne( {group: this.props.groupId, incomplete:true} ) ) { 
-                                      return Meteor.collection('Elections').find({ group: this.props.groupId, incomplete:false}, {sort: {createdAt: -1}})[0].allSlogans}
+                                        var previousResults = Meteor.collection('Elections').find({ group: this.props.groupId, incomplete:false}, {sort: {createdAt: -1}});
+                                        if(previousResults && previousResults.length > 0){
+                                            return previousResults[0].allSlogans;
+                                        }else{
+                                            return [];
+                                        }
+                                      }
                                       else{ return Meteor.collection('Slogans').find({group: this.props.groupId}, {sort: {slogan: -1}}) }
                                     }
                               }

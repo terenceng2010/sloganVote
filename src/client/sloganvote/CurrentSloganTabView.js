@@ -17,16 +17,7 @@ import CurrentSlogan from './CurrentSlogan';
 
 @connectMeteor
 export default class CurrentSloganTabView extends Component {
- 
-
-
-  getMeteorData() {
-      const groupsHandle = Meteor.subscribe('groups');
-      return { 
-          groupsReady : groupsHandle.ready()
-      };
-  }  
-    
+     
   constructor(props) {
     super(props);
   }
