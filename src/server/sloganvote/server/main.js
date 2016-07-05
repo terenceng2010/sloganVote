@@ -13,7 +13,7 @@ Groups = new Mongo.Collection('Groups');
 
 Meteor.methods({
    createNewGroup:function(groupName){
-     Groups.insert({name:groupName,users:[Meteor.userId()],admins:[Meteor.userId()]});  
+     return Groups.insert({name:groupName,users:[Meteor.userId()],admins:[Meteor.userId()]});  
    },
    addUserToGroup:function(groupId,username){
      console.log('addUserToGroup',groupId,username);
