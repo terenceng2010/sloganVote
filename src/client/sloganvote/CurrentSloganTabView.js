@@ -15,6 +15,8 @@ import Meteor,{ connectMeteor, MeteorComplexListView } from 'react-native-meteor
 import ScrollableTabView  from 'react-native-scrollable-tab-view';
 import CurrentSlogan from './CurrentSlogan';
 
+import NewGroup from './NewGroup';
+
 @connectMeteor
 export default class CurrentSloganTabView extends Component {
      
@@ -55,16 +57,24 @@ export default class CurrentSloganTabView extends Component {
             return <CurrentSlogan key={index} groupId={eachUserGroup._id} tabLabel={eachUserGroup.name}/>
         });
         allGroups = allGroups.concat(userGroups);
-        
+        allGroups.push( <NewGroup key={-2} tabLabel='+'/> );
       
      return (
           <View  style={styles.mainContainer}>
-            <Button
-                containerStyle={{margin: 0,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: '#EA526F'}}
-                style={{fontSize: 20, color: 'white'}}
-                onPress={() => this._handlePress()}>
-                Back
-            </Button>
+            <View style={styles.toolbar}>
+                <Button
+                    containerStyle={{margin: 0,padding:10, height:45, overflow:'hidden', borderRadius:4, backgroundColor: '#EA526F'}}
+                    style={{fontSize: 20, color: 'white'}}
+                    onPress={() => this._handlePress()}>
+                    Back
+                </Button> 
+                <Text style={styles.welcome}>
+                Votetage
+                </Text>
+                <Text style={styles.welcome}>
+                 &nbsp;
+                </Text>                                        
+            </View>
             <ScrollableTabView initialPage={initialPageIndex}>
                 {allGroups}
             </ScrollableTabView>       
@@ -89,6 +99,14 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5,
   },
+  toolbar: {
+    backgroundColor:'#25CED1',
+    paddingTop:10,
+    paddingBottom:10,
+    justifyContent: 'space-between',
+    alignItems: 'center',    
+    flexDirection:'row'   
+  },  
 });
 
 //module.exports = SplashPage;
