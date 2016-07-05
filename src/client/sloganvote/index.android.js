@@ -121,7 +121,7 @@ class sloganvote extends Component {
     return (
       <Navigator
         ref="navigator"
-        initialRoute={{id: 1, }}
+        initialRoute={{id: 7, }}
         renderScene={this._renderScene} />
     );
   }
