@@ -13,7 +13,7 @@ import {
 import Button from 'react-native-button';
 import Meteor,{ connectMeteor, MeteorComplexListView } from 'react-native-meteor';
 import ScrollableTabView  from 'react-native-scrollable-tab-view';
-import CurrentSlogan from './CurrentSlogan';
+import CurrentSloganListView from './CurrentSloganListView';
 
 import NewGroup from './NewGroup';
 
@@ -51,10 +51,10 @@ export default class CurrentSloganTabView extends Component {
         }  
                 
         var allGroups = [];
-        allGroups.push( <CurrentSlogan key={-1} groupId="" tabLabel='Public'/> );
+        allGroups.push( <CurrentSloganListView key={-1} groupId="" tabLabel='Public'/> );
         
         userGroups = userGroups.map(function(eachUserGroup,index){
-            return <CurrentSlogan key={index} groupId={eachUserGroup._id} tabLabel={eachUserGroup.name}/>
+            return <CurrentSloganListView key={index} groupId={eachUserGroup._id} tabLabel={eachUserGroup.name}/>
         });
         allGroups = allGroups.concat(userGroups);
         allGroups.push( <NewGroup key={-2} tabLabel='+'/> );

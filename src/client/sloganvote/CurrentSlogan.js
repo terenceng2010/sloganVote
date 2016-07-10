@@ -199,7 +199,7 @@ export default class CurrentSlogan extends Component {
                     style={{fontSize: 20, color: 'white'}}
                     onPress={() => this._handlePress()}
                     >
-                    Time Remain ({this.state.timeLeftToVote})
+                    Time Remain ({this.state.timeLeftToVote})3
                 </Button>     
                 
                 <MeteorComplexListView
