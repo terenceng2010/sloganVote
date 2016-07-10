@@ -1,6 +1,11 @@
 import { Meteor } from 'meteor/meteor';
+import fs from 'fs';
+
 var CronJob = require('cron').CronJob;
 var CronTime = require('cron').CronTime;
+var Log = require('log');
+
+log = new Log('info', fs.createWriteStream('my.log'));
 
 Meteor.startup(() => {
   // code to run on server at startup
@@ -84,22 +89,27 @@ Meteor.methods({
              var s = Streamy.socketsForUsers(eachUserId);
              
              if(s){
-                s._sockets.map(function(eachSocket){
-                    Streamy.emit('callForVote', { data: 'callForVote', groupId: groupId }, eachSocket);   
-                });                 
+                if(s._sockets){                  
+                    if(s._sockets.length > 0 ){
+                        
+                        s._sockets.map(function(eachSocket){
+                            try{
+                                Streamy.emit('callForVote', { data: 'callForVote', groupId: groupId }, eachSocket);   
+                            }catch(e){
+                                log.error('callForVote',e);
+                            }
+                        });                      
+                    }                   
+                }       
              }
           });
        }
 
        
-
-       
        var job = new CronJob({
            cronTime: voteFinishTime,
            onTick: Meteor.bindEnvironment(function() {
-               
-
-               
+                       
                console.log('time is up!');
                
 
